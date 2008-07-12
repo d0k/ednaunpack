@@ -5,10 +5,10 @@ import javax.swing.*;
 
 
 public class GUI extends JFrame implements ActionListener {
-	private JTextField dvdpath, destinationpath;
-	private JProgressBar progress;
-	private JButton install, close;
-	private final String os = System.getProperty("os.name");
+	JTextField dvdpath, destinationpath;
+	JProgressBar progress;
+	JButton install, close;
+	final String os = System.getProperty("os.name");
 
 	public GUI() {
 		super("Edna bricht aus");
@@ -61,7 +61,7 @@ public class GUI extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == install) {
-			Unpack unpack = new Unpack(dvdpath.getText(), destinationpath.getText(), progress);
+			Unpack unpack = new Unpack(this);
 			unpack.start();
 			install.setEnabled(false);
 		} else if (e.getSource() == close) {

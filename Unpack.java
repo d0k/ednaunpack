@@ -11,12 +11,12 @@ import SevenZip.Compression.LZMA.Decoder;
 public class Unpack extends Thread {
 	private final static byte[] zlbsignature = {'z', 'l', 'b', 26};
 	private String input, output;
-	private JProgressBar p;
+	private GUI gui;
 
-	public Unpack(String inputpath, String outputpath, JProgressBar p) {
-		input = inputpath;
-		output = outputpath;
-		this.p = p;
+	public Unpack(GUI g) {
+		input = g.dvdpath.getText();
+		output = g.destinationpath.getText();
+		gui = g;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class Unpack extends Thread {
 				f.setLastModified(file.mtime.getTime());
 
 				//System.out.println(file.fileName);
-				p.setValue(p.getValue()+1);
+				gui.progress.setValue(gui.progress.getValue()+1);
 				file = fl.nextFile();
 			}
 
@@ -107,6 +107,7 @@ public class Unpack extends Thread {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			gui.install.setEnabled(true);
 		}
 	}
 
