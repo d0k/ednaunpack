@@ -14,9 +14,21 @@ public class FileList {
 	private FileList() {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			RandomAccessFile in = new RandomAccessFile("files.lzma", "r");
-			MappedByteBuffer buf = in.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, in.length());
+			//TODO: less ugliness here
+			File tmp = File.createTempFile("files", ".lzma");
+			{
+				InputStream tmpin = this.getClass().getClassLoader().getResourceAsStream("files.lzma");
+				FileOutputStream tmpout = new FileOutputStream(tmp);
+				byte[] buf = new byte[1024];
+				int i = 0;
+				while ((i = tmpin.read(buf)) != -1) {
+					tmpout.write(buf, 0, i);
+				}
+			}
+			FileInputStream in = new FileInputStream(tmp);
+			MappedByteBuffer buf = in.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, in.getChannel().size());
 			in.close();
+			tmp.delete();
 
 			Decoder decoder = new Decoder();
 			decoder.SetDecoderProperties(Unpack.readProps(buf));
