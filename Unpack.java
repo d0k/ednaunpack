@@ -22,7 +22,7 @@ public class Unpack extends Thread {
 			Slice slices[] = new Slice[8];
 			for (int i = 0; i < slices.length; i++) {
 				char letter = (char) (i+'a');
-				slices[i] = new Slice("setup-1"+letter+".bin"); //TODO: fix path, this is for debugging
+				slices[i] = new Slice(input+"/install/instbin/software/setup-1"+letter+".bin");
 			}
 			FileList fl = FileList.getInstance();
 			FileList.FileLocation file = fl.nextFile();
