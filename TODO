@@ -1,0 +1,8 @@
+High:
+* cross-volume files fail
+* call instruction deoptimizer is not implemented
+
+Low:
+* documentation
+* better GUI
+* speed ... it's java :(
