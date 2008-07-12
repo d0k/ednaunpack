@@ -93,6 +93,17 @@ public class Unpack extends Thread {
 				p.setValue(p.getValue()+1);
 				file = fl.nextFile();
 			}
+
+			// create some empty directories for savegames
+			for (int i = 0; i < 10; i++) {
+				String name = output+"/EbaSaveGame";
+				if (i != 0)
+					name += i;
+				new File(name).mkdir();
+			}
+
+			JOptionPane.showMessageDialog(new JFrame(), "Installation abgeschlossen!", "Fertig", JOptionPane.INFORMATION_MESSAGE);
+			System.exit(0);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();

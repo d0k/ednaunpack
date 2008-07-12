@@ -18,12 +18,7 @@
 		<manifest file="MANIFEST.MF">
 			<attribute name="Main-Class" value="GUI"/>
 		</manifest>
-		<jar destfile="ednaunpack.jar" manifest="MANIFEST.MF" basedir=".">
-			<fileset>
-				<include name="**/*.class"/>
-				<include name="files.lzma"/>
-			</fileset>
-		</jar>
+		<jar destfile="ednaunpack.jar" manifest="MANIFEST.MF" basedir="." includes="**/*.class files.lzma"/>
 	</target>
 
 	<target name="clean">
