@@ -63,6 +63,7 @@ public class GUI extends JFrame implements ActionListener {
 		if (e.getSource() == install) {
 			Unpack unpack = new Unpack(dvdpath.getText(), destinationpath.getText(), progress);
 			unpack.start();
+			install.setEnabled(false);
 		} else if (e.getSource() == close) {
 			System.exit(0);
 		}
