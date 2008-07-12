@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.*;
 import java.util.Date;
 
@@ -13,18 +15,20 @@ public class FileList {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			RandomAccessFile in = new RandomAccessFile("files.lzma", "r");
+			MappedByteBuffer buf = in.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, in.length());
+			in.close();
 
 			Decoder decoder = new Decoder();
-			decoder.SetDecoderProperties(Unpack.readProps(in));
+			decoder.SetDecoderProperties(Unpack.readProps(buf));
 
 			//from LzmaAlone.java
 			int len = 0;
 			for (int i = 0; i < 8; i++)
 			{
-				int v = in.read();
+				int v = buf.get() & 0xFF;
 				len |= ((long)v) << (8 * i);
 			}
-			decoder.Code(in, out, len);
+			decoder.Code(buf, out, len);
 			data = out.toByteArray();
 			out.close();
 		} catch (Exception e) {

@@ -9,10 +9,10 @@ class Slice {
 		try {
 			file = new RandomAccessFile(fileName, "r");
 
-			if (!Unpack.readBytes(file, signature.length).equals(signature))
+			if (!readBytes(signature.length).equals(signature))
 				throw new InvalidFileException("Wrong signature");
 
-			if (Unpack.readBytes(file, 4).toInt() != new File(fileName).length()) //TODO do we really need an extra file handle?
+			if (readBytes(4).toInt() != new File(fileName).length()) //TODO do we really need an extra file handle?
 				throw new InvalidFileException("Wrong filesize");
 
 		} catch (IOException e) {
@@ -20,7 +20,12 @@ class Slice {
 		}
 	}
 
-
+	private ByteArray readBytes(int len) throws IOException {
+		byte[] tmp = new byte[len];
+		file.read(tmp);
+		ByteArray ret = new ByteArray(tmp);
+		return ret;
+	}
 
 	public RandomAccessFile getFile() throws IOException {
 		return file;

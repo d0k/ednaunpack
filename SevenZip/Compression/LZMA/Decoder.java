@@ -5,6 +5,7 @@ import SevenZip.Compression.LZMA.Base;
 import SevenZip.Compression.LZ.OutWindow;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 public class Decoder
 {
@@ -199,7 +200,7 @@ public class Decoder
 		m_RangeDecoder.Init();
 	}
 
-	public boolean Code(RandomAccessFile inStream, java.io.OutputStream outStream,
+	public boolean Code(ByteBuffer inStream, java.io.OutputStream outStream,
 			long outSize) throws IOException
 	{
 		m_RangeDecoder.SetStream(inStream);

@@ -1,4 +1,4 @@
 * make cross-volume unpack less ugly
 * documentation
 * better GUI
-* speed ... it's java (maybe with java.nio?)
+* refractor

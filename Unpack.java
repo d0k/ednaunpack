@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import javax.swing.JProgressBar;
 
@@ -19,18 +22,20 @@ public class Unpack extends Thread {
 	@Override
 	public void run() {
 		try {
-			Slice slices[] = new Slice[8];
+			MappedByteBuffer slices[] = new MappedByteBuffer[8];
 			for (int i = 0; i < slices.length; i++) {
 				char letter = (char) (i+'a');
-				slices[i] = new Slice(input+"/install/instbin/software/setup-1"+letter+".bin");
+				Slice slice = new Slice(input+"/install/instbin/software/setup-1"+letter+".bin");
+				slices[i] = slice.getFile().getChannel().map(FileChannel.MapMode.READ_ONLY, 0, slice.getFile().length());
+				slice.getFile().close();
 			}
 			FileList fl = FileList.getInstance();
 			FileList.FileLocation file = fl.nextFile();
 			Decoder decoder = new Decoder();
 			while (file != null) {
-				RandomAccessFile in = slices[file.firstSlice].getFile();
+				MappedByteBuffer in = slices[file.firstSlice];
+				in.position(file.startOffset);
 
-				in.seek(file.startOffset);
 				if (!Unpack.readBytes(in, zlbsignature.length).equals(zlbsignature))
 					throw new InvalidFileException("Wrong sigature (2)");
 
@@ -52,22 +57,24 @@ public class Unpack extends Thread {
 
 					// this part is just quick'n'dirty. I need to redo it sometime ;)
 					if (file.firstSlice != file.lastSlice) {
-						int firstlen = (int)in.length()-file.startOffset-zlbsignature.length-5;
+						int firstlen = (int)in.capacity()-file.startOffset-zlbsignature.length-5;
 						int len = file.compressedSize-firstlen;
 						byte[] firstdata = new byte[firstlen];
-						in.read(firstdata);
-						in = slices[file.lastSlice].getFile();
+						in.get(firstdata);
+						in = slices[file.lastSlice];
 						byte[] lastdata = new byte[len];
-						in.read(lastdata);
+						in.position(12);
+						in.get(lastdata);
 						File tmpfile = new File(output+"/cross.tmp");
 						FileOutputStream tmp = new FileOutputStream(tmpfile); //TODO: quick'n'dirty
 						tmp.write(firstdata);
 						tmp.write(lastdata);
 						tmp.close();
-						in = new RandomAccessFile(tmpfile, "r");
-						decoder.Code(in, out, file.originalSize);
-						in.close();
-						tmpfile.delete();
+						RandomAccessFile rtmp = new RandomAccessFile(tmpfile, "r");
+						MappedByteBuffer btmp = rtmp.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, rtmp.length());
+						rtmp.close();
+						decoder.Code(btmp, out, file.originalSize);
+						//tmpfile.delete();
 					} else {
 						decoder.Code(in, out, file.originalSize);
 					}
@@ -84,15 +91,15 @@ public class Unpack extends Thread {
 		}
 	}
 
-	public static byte[] readProps(DataInput in) throws IOException {
+	public static byte[] readProps(ByteBuffer in) throws IOException {
 		byte[] props = new byte[5];
-		in.readFully(props);
+		in.get(props);
 		return props;
 	}
 
-	public static ByteArray readBytes(DataInput in, int len) throws IOException {
+	public static ByteArray readBytes(ByteBuffer in, int len) throws IOException {
 		byte[] tmp = new byte[len];
-		in.readFully(tmp);
+		in.get(tmp);
 		ByteArray ret = new ByteArray(tmp);
 		return ret;
 	}
