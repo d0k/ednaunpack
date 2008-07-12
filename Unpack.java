@@ -39,9 +39,19 @@ public class Unpack extends Thread {
 				String fileName = output+"/"+file.fileName;
 				File f = new File(fileName);
 				f.getParentFile().mkdir();
-				FileOutputStream out = new FileOutputStream(f);
-				decoder.Code(in, out, file.originalSize);
-				out.close();
+				if (fileName.contains(".exe") || fileName.contains(".dll")) { //FIXME: there is an property for this in the installer
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					decoder.Code(in, out, file.originalSize);
+					byte[] data = out.toByteArray();
+					transformCallInstructions(data);
+					FileOutputStream write = new FileOutputStream(f);
+					write.write(data);
+					write.close();
+				} else {
+					FileOutputStream out = new FileOutputStream(f);
+					decoder.Code(in, out, file.originalSize);
+					out.close();
+				}
 				f.setLastModified(file.mtime.getTime());
 
 				System.out.println(file.fileName);
@@ -64,5 +74,28 @@ public class Unpack extends Thread {
 		in.readFully(tmp);
 		ByteArray ret = new ByteArray(tmp);
 		return ret;
+	}
+
+	/** Transforms addresses (x86) in absolute CALL or JMP instructions to relative ones */
+	private static void transformCallInstructions(byte[] p) {
+		int addr;
+		int i = 0;
+		while (i < p.length-4) {
+			if ((p[i] & 0xFF) == (0xE8) || (p[i] & 0xFF) == 0xE9) {
+				i++;
+				if ((p[i+3] & 0xFF) == 0x00 || (p[i+3] & 0xFF) == 0xFF) {
+					addr = i + 4;
+					addr = -addr;
+					for (int x = 0; x <= 2; x++) {
+						addr += p[i+x] & 0xFF;
+						p[i+x] = (byte) addr;
+						addr >>= 8;
+					}
+				}
+				i += 4;
+			} else {
+				i++;
+			}
+		}
 	}
 }
