@@ -48,7 +48,7 @@ public class FileList {
 		DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm");
 		try {
 			Date mtime = df.parse(line[1]);
-			return new FileLocation(line[0], Integer.parseInt(line[2]), Integer.parseInt(line[3]), Integer.parseInt(line[4]), Integer.parseInt(line[6]), mtime);
+			return new FileLocation(line[0], Integer.parseInt(line[2]), Integer.parseInt(line[3]), Integer.parseInt(line[4]), Integer.parseInt(line[6]), Integer.parseInt(line[7]), mtime);
 		} catch (ParseException e) {
 			return null;
 		}
@@ -57,14 +57,15 @@ public class FileList {
 	public class FileLocation {
 		public String fileName;
 		public int firstSlice, lastSlice;
-		public int startOffset, originalSize;
+		public int startOffset, originalSize, compressedSize;
 		public Date mtime;
-		private FileLocation(String fileName, int firstSlice, int lastSlice, int startOffset, int originalSize, Date mtime) {
+		private FileLocation(String fileName, int firstSlice, int lastSlice, int startOffset, int originalSize, int compressedSize, Date mtime) {
 			this.fileName = fileName;
 			this.firstSlice = firstSlice;
 			this.lastSlice = lastSlice;
 			this.startOffset = startOffset;
 			this.originalSize = originalSize;
+			this.compressedSize = compressedSize;
 			this.mtime = mtime;
 		}
 	}

@@ -49,7 +49,28 @@ public class Unpack extends Thread {
 					write.close();
 				} else {
 					FileOutputStream out = new FileOutputStream(f);
-					decoder.Code(in, out, file.originalSize);
+
+					// this part is just quick'n'dirty. I need to redo it sometime ;)
+					if (file.firstSlice != file.lastSlice) {
+						int firstlen = (int)in.length()-file.startOffset-zlbsignature.length-5;
+						int len = file.compressedSize-firstlen;
+						byte[] firstdata = new byte[firstlen];
+						in.read(firstdata);
+						in = slices[file.lastSlice].getFile();
+						byte[] lastdata = new byte[len];
+						in.read(lastdata);
+						File tmpfile = new File(output+"/cross.tmp");
+						FileOutputStream tmp = new FileOutputStream(tmpfile); //TODO: quick'n'dirty
+						tmp.write(firstdata);
+						tmp.write(lastdata);
+						tmp.close();
+						in = new RandomAccessFile(tmpfile, "r");
+						decoder.Code(in, out, file.originalSize);
+						in.close();
+						tmpfile.delete();
+					} else {
+						decoder.Code(in, out, file.originalSize);
+					}
 					out.close();
 				}
 				f.setLastModified(file.mtime.getTime());
