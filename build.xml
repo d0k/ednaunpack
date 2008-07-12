@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project default="compile" basedir=".">
+	<target name="compile">
+		<javac srcdir="." destdir="." target="1.6" source="1.6"/>
+	</target>
+
+	<target name="compresslist">
+		<exec executable="lzma">
+			<arg value="-k"/>
+			<arg value="-z"/>
+			<!--<arg value="-best"/>-->
+			<arg value="files.csv"/>
+		</exec>
+		<move file="files.csv.lzma" tofile="files.lzma"/>
+	</target>
+
+	<target name="jar" depends="compile,compresslist">
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="GUI"/>
+		</manifest>
+		<jar destfile="ednaunpack.jar" manifest="MANIFEST.MF" basedir=".">
+			<fileset>
+				<include name="**/*.class"/>
+				<include name="files.lzma"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete>
+			<fileset dir=".">
+				<include name="**/*.class"/>
+				<include name="MANIFEST.MF"/>
+				<include name="files.lzma"/>
+			</fileset>
+		</delete>
+	</target>
+</project>

@@ -3,7 +3,7 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-import javax.swing.JProgressBar;
+import javax.swing.*;
 
 import SevenZip.Compression.LZMA.Decoder;
 
@@ -43,7 +43,8 @@ public class Unpack extends Thread {
 
 				String fileName = output+"/"+file.fileName;
 				File f = new File(fileName);
-				f.getParentFile().mkdir();
+				f.getParentFile().mkdirs();
+
 				if (fileName.contains(".exe") || fileName.contains(".dll")) { //FIXME: there is an property for this in the installer
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					decoder.Code(in, out, file.originalSize);
@@ -61,20 +62,26 @@ public class Unpack extends Thread {
 						int len = file.compressedSize-firstlen;
 						byte[] firstdata = new byte[firstlen];
 						in.get(firstdata);
+
+						slices[file.firstSlice] = null;
+						System.gc();
+
 						in = slices[file.lastSlice];
 						byte[] lastdata = new byte[len];
 						in.position(12);
 						in.get(lastdata);
+
 						File tmpfile = new File(output+"/cross.tmp");
 						FileOutputStream tmp = new FileOutputStream(tmpfile); //TODO: quick'n'dirty
 						tmp.write(firstdata);
 						tmp.write(lastdata);
 						tmp.close();
+
 						RandomAccessFile rtmp = new RandomAccessFile(tmpfile, "r");
 						MappedByteBuffer btmp = rtmp.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, rtmp.length());
 						rtmp.close();
 						decoder.Code(btmp, out, file.originalSize);
-						//tmpfile.delete();
+						tmpfile.delete();
 					} else {
 						decoder.Code(in, out, file.originalSize);
 					}
@@ -82,11 +89,12 @@ public class Unpack extends Thread {
 				}
 				f.setLastModified(file.mtime.getTime());
 
-				System.out.println(file.fileName);
+				//System.out.println(file.fileName);
 				p.setValue(p.getValue()+1);
 				file = fl.nextFile();
 			}
 		} catch (Exception e) {
+			JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}

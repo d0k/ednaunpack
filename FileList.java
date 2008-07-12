@@ -58,7 +58,7 @@ public class FileList {
 		}
 	}
 
-	public class FileLocation {
+	public static class FileLocation {
 		public String fileName;
 		public int firstSlice, lastSlice;
 		public int startOffset, originalSize, compressedSize;

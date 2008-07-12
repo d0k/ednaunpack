@@ -4,7 +4,6 @@ import SevenZip.Compression.RangeCoder.BitTreeDecoder;
 import SevenZip.Compression.LZMA.Base;
 import SevenZip.Compression.LZ.OutWindow;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class Decoder
