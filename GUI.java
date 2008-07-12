@@ -8,7 +8,7 @@ public class GUI extends JFrame implements ActionListener {
 	private JTextField dvdpath, destinationpath;
 	private JProgressBar progress;
 	private JButton install, close;
-	private String os = System.getProperty("os.name");
+	private final String os = System.getProperty("os.name");
 
 	public GUI() {
 		super("Edna bricht aus");
@@ -32,7 +32,7 @@ public class GUI extends JFrame implements ActionListener {
 		JLabel destinationlabel = new JLabel("Installationspfad:");
 		paths.add(destinationlabel);
 
-		destinationpath = new JTextField("~/Edna bricht aus");
+		destinationpath = new JTextField(System.getProperty("user.home")+"/Edna bricht aus");
 		paths.add(destinationpath);
 
 		getContentPane().add(paths);
@@ -54,7 +54,7 @@ public class GUI extends JFrame implements ActionListener {
 
 		getContentPane().add(buttonpanel);
 
-		setSize(300, 200);
+		setSize(500, 150);
 		setVisible(true);
 	}
 
