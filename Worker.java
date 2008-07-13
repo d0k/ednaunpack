@@ -38,6 +38,7 @@ public class Worker extends Thread {
 					decoder.Code(in, out, file.originalSize);
 					out.close();
 				}
+				f.setLastModified(file.mtime.getTime());
 				ui.increaseProgress();
 			}
 		} catch (Exception e) {
