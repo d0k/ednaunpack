@@ -34,6 +34,7 @@ public class Unpack extends Thread {
 			gui.showSuccess();
 		} catch (Exception e) {
 			gui.showError(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 

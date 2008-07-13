@@ -17,7 +17,8 @@ class Slice {
 		try {
 			String fileName = path+"/setup-1"+slicenum+".bin";
 			slicenum++;
-			file.close();
+			if (file != null)
+				file.close();
 			file = new RandomAccessFile(fileName, "r");
 
 			if (!Util.isByteArrayEqual(Util.readBytes(file, signature.length), signature))
