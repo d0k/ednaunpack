@@ -80,7 +80,7 @@ public class GUI extends JFrame implements ActionListener, UI {
 	}
 
 	@Override
-	public void increaseProgress() {
+	public synchronized void increaseProgress() {
 		progress.setValue(progress.getValue()+1);
 	}
 
@@ -97,12 +97,12 @@ public class GUI extends JFrame implements ActionListener, UI {
 	}
 
 	@Override
-	public String getDVDPath() {
+	public synchronized String getDVDPath() {
 		return dvdpath.getText();
 	}
 
 	@Override
-	public String getDestinationPath() {
+	public synchronized String getDestinationPath() {
 		return destinationpath.getText();
 	}
 

@@ -25,8 +25,7 @@ public class Worker extends Thread {
 				File f = new File(fileName);
 				f.getParentFile().mkdirs();
 
-				boolean needsTransform = file.fileName.contains(".exe") || file.fileName.contains(".dll");
-				if (needsTransform) {
+				if ((file.fileName.contains(".exe") || file.fileName.contains(".dll"))) { //TODO there is an attribute for this
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					decoder.Code(in, out, file.originalSize);
 					byte[] decompressedData = out.toByteArray();
