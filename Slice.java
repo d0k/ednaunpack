@@ -7,6 +7,7 @@ class Slice {
 	private String path;
 	private char slicenum = 'a';
 	private RandomAccessFile file;
+	private FileList list = FileList.getInstance();
 
 	public Slice(String path) throws InvalidFileException, FileNotFoundException {
 		this.path = path;
@@ -33,7 +34,7 @@ class Slice {
 	}
 
 	/** reads data for <b>f</b> from Slice. */
-	public synchronized FileData readFile(FileList.FileLocation f) throws InvalidFileException, FileNotFoundException, IOException {
+	private FileData readFile(FileList.FileLocation f) throws InvalidFileException, FileNotFoundException, IOException {
 		byte[] tmp = new byte[f.compressedSize];
 		byte[] props = new byte[5];
 
@@ -68,11 +69,22 @@ class Slice {
 		FileData data = new FileData();
 		data.data = tmp;
 		data.props = props;
+		data.file = f;
 		return data;
+	}
+
+
+	/** reads data for next file from list. */
+	public synchronized FileData readNextFile() throws FileNotFoundException, InvalidFileException, IOException {
+		FileList.FileLocation loc = list.nextFile();
+		if (loc != null)
+			return readFile(loc);
+		return null;
 	}
 
 	public static class FileData {
 		public byte[] props;
 		public byte[] data;
+		public FileList.FileLocation file;
 	}
 }

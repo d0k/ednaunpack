@@ -12,8 +12,7 @@ public class Unpack extends Thread {
 	public void run() {
 		try {
 			Slice slice = new Slice(gui.getDVDPath()+"/install/instbin/software");
-			//Worker[] w = new Worker[Runtime.getRuntime().availableProcessors()];
-			Worker[] w = new Worker[1]; // FIXME there is a race condition that prevents multiple decoding threads
+			Worker[] w = new Worker[Runtime.getRuntime().availableProcessors()];
 
 			for (int i = 0; i < w.length; i++) {
 				w[i] = new Worker(gui, slice);

@@ -14,10 +14,9 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		FileList list = FileList.getInstance();
-		for (FileList.FileLocation file = list.nextFile(); file != null; file = list.nextFile()) {
-			try {
-				Slice.FileData data = slice.readFile(file);
+		try {
+			for (Slice.FileData data = slice.readNextFile(); data != null; data = slice.readNextFile()) {
+				FileList.FileLocation file = data.file;
 
 				ByteArrayInputStream in = new ByteArrayInputStream(data.data);
 				decoder.SetDecoderProperties(data.props);
@@ -41,10 +40,10 @@ public class Worker extends Thread {
 					out.close();
 				}
 				ui.increaseProgress();
-			} catch (Exception e) {
-				ui.showError(e.getLocalizedMessage());
-				e.printStackTrace();
 			}
+		} catch (Exception e) {
+			ui.showError(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 	}
 }
