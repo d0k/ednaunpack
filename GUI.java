@@ -4,10 +4,10 @@ import java.awt.event.*;
 import javax.swing.*;
 
 
-public class GUI extends JFrame implements ActionListener {
-	JTextField dvdpath, destinationpath;
-	JProgressBar progress;
-	JButton install, close;
+public class GUI extends JFrame implements ActionListener, UI {
+	private JTextField dvdpath, destinationpath;
+	private JProgressBar progress;
+	private JButton install, close;
 	final String os = System.getProperty("os.name");
 
 	public GUI() {
@@ -63,14 +63,47 @@ public class GUI extends JFrame implements ActionListener {
 		if (e.getSource() == install) {
 			Unpack unpack = new Unpack(this);
 			unpack.start();
-			install.setEnabled(false);
+			enableFields(false);
 		} else if (e.getSource() == close) {
 			System.exit(0);
 		}
 	}
 
+	private void enableFields(boolean enable) {
+		install.setEnabled(enable);
+		dvdpath.setEnabled(enable);
+		destinationpath.setEnabled(enable);
+	}
+
 	public static void main(String[] args) {
 		new GUI();
+	}
+
+	@Override
+	public void increaseProgress() {
+		progress.setValue(progress.getValue()+1);
+	}
+
+	@Override
+	public void showError(String text) {
+		JOptionPane.showMessageDialog(new JFrame(), text, "Error", JOptionPane.ERROR_MESSAGE);
+		enableFields(true);
+	}
+
+	@Override
+	public void showSuccess() {
+		JOptionPane.showMessageDialog(new JFrame(), "Installation abgeschlossen!", "Fertig", JOptionPane.INFORMATION_MESSAGE);
+		System.exit(0);
+	}
+
+	@Override
+	public String getDVDPath() {
+		return dvdpath.getText();
+	}
+
+	@Override
+	public String getDestinationPath() {
+		return destinationpath.getText();
 	}
 
 }

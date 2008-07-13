@@ -1,6 +1,5 @@
 package SevenZip.Compression.RangeCoder;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class Decoder
 {
@@ -13,9 +12,9 @@ public class Decoder
 	int Range;
 	int Code;
 
-	ByteBuffer Stream;
+	java.io.InputStream Stream;
 
-	public final void SetStream(ByteBuffer stream)
+	public final void SetStream(java.io.InputStream stream)
 	{
 		Stream = stream;
 	}
@@ -30,7 +29,7 @@ public class Decoder
 		Code = 0;
 		Range = -1;
 		for (int i = 0; i < 5; i++)
-			Code = (Code << 8) | (Stream.get() & 0xFF);
+			Code = (Code << 8) | Stream.read();
 	}
 
 	public final int DecodeDirectBits(int numTotalBits) throws IOException
@@ -45,7 +44,7 @@ public class Decoder
 
 			if ((Range & kTopMask) == 0)
 			{
-				Code = (Code << 8) | (Stream.get() & 0xFF);
+				Code = (Code << 8) | Stream.read();
 				Range <<= 8;
 			}
 		}
@@ -62,7 +61,7 @@ public class Decoder
 			probs[index] = (short)(prob + ((kBitModelTotal - prob) >>> kNumMoveBits));
 			if ((Range & kTopMask) == 0)
 			{
-				Code = (Code << 8) | (Stream.get() & 0xFF);
+				Code = (Code << 8) | Stream.read();
 				Range <<= 8;
 			}
 			return 0;
@@ -74,7 +73,7 @@ public class Decoder
 			probs[index] = (short)(prob - ((prob) >>> kNumMoveBits));
 			if ((Range & kTopMask) == 0)
 			{
-				Code = (Code << 8) | (Stream.get() & 0xFF);
+				Code = (Code << 8) | Stream.read();
 				Range <<= 8;
 			}
 			return 1;

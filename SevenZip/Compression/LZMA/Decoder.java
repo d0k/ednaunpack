@@ -4,7 +4,6 @@ import SevenZip.Compression.RangeCoder.BitTreeDecoder;
 import SevenZip.Compression.LZMA.Base;
 import SevenZip.Compression.LZ.OutWindow;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class Decoder
 {
@@ -199,7 +198,7 @@ public class Decoder
 		m_RangeDecoder.Init();
 	}
 
-	public boolean Code(ByteBuffer inStream, java.io.OutputStream outStream,
+	public boolean Code(java.io.InputStream inStream, java.io.OutputStream outStream,
 			long outSize) throws IOException
 	{
 		m_RangeDecoder.SetStream(inStream);

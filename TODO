@@ -1,5 +1,3 @@
-* make cross-volume unpack less ugly
+* fix race condition to allow multithreading
 * documentation
 * better GUI
-* refractor
-* reduce memory usage

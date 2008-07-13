@@ -1,6 +1,4 @@
 import java.io.*;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.text.*;
 import java.util.Date;
 
@@ -14,33 +12,21 @@ public class FileList {
 	private FileList() {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			//TODO: less ugliness here
-			File tmp = File.createTempFile("files", ".lzma");
-			{
-				InputStream tmpin = this.getClass().getClassLoader().getResourceAsStream("files.lzma");
-				FileOutputStream tmpout = new FileOutputStream(tmp);
-				byte[] buf = new byte[1024];
-				int i = 0;
-				while ((i = tmpin.read(buf)) != -1) {
-					tmpout.write(buf, 0, i);
-				}
-			}
-			FileInputStream in = new FileInputStream(tmp);
-			MappedByteBuffer buf = in.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, in.getChannel().size());
-			in.close();
-			tmp.delete();
+			InputStream in = this.getClass().getClassLoader().getResourceAsStream("files.lzma");
 
 			Decoder decoder = new Decoder();
-			decoder.SetDecoderProperties(Unpack.readProps(buf));
+			byte[] props = new byte[5];
+			in.read(props);
+			decoder.SetDecoderProperties(props);
 
 			//from LzmaAlone.java
 			int len = 0;
 			for (int i = 0; i < 8; i++)
 			{
-				int v = buf.get() & 0xFF;
+				int v = in.read();
 				len |= ((long)v) << (8 * i);
 			}
-			decoder.Code(buf, out, len);
+			decoder.Code(in, out, len);
 			data = out.toByteArray();
 			out.close();
 		} catch (Exception e) {
@@ -52,7 +38,7 @@ public class FileList {
 		return instance == null ? new FileList() : instance;
 	}
 
-	public FileLocation nextFile(){
+	public synchronized FileLocation nextFile(){
 		int start = offset;
 		while (data[offset] != '\n') {
 			if (offset+2 == data.length)
