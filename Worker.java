@@ -7,10 +7,12 @@ public class Worker extends Thread {
 	private Slice slice;
 	private Decoder decoder = new Decoder();
 	private UI ui;
+	private String destpath;
 
 	public Worker(UI ui, Slice slice) {
 		this.slice = slice;
 		this.ui = ui;
+		this.destpath = ui.getDestinationPath();
 	}
 
 	public void run() {
@@ -21,7 +23,7 @@ public class Worker extends Thread {
 				ByteArrayInputStream in = new ByteArrayInputStream(data.data);
 				decoder.SetDecoderProperties(data.props);
 
-				String fileName = ui.getDestinationPath()+"/"+file.fileName;
+				String fileName = destpath+"/"+file.fileName;
 				File f = new File(fileName);
 				f.getParentFile().mkdirs();
 

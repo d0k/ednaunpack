@@ -38,15 +38,19 @@ public class FileList {
 		return instance == null ? new FileList() : instance;
 	}
 
-	public synchronized FileLocation nextFile(){
-		int start = offset;
-		while (data[offset] != '\n') {
-			if (offset+2 == data.length)
-				return null;
+	public FileLocation nextFile(){
+		String[] line;
+		synchronized (this) {
+			int start = offset;
+			while (data[offset] != '\n') {
+				if (offset+2 == data.length)
+					return null;
+				offset++;
+			}
+
+			line = new String(data, start, offset-start).split(";");
 			offset++;
 		}
-		String line[] = new String(data, start, offset-start).split(";");
-		offset++;
 		DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm");
 		try {
 			Date mtime = df.parse(line[1]);

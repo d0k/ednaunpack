@@ -38,32 +38,29 @@ class Slice {
 		byte[] tmp = new byte[f.compressedSize];
 		byte[] props = new byte[5];
 
-		file.seek(f.startOffset);
-		if (!Util.isByteArrayEqual(Util.readBytes(file, zlbsignature.length), zlbsignature)) {
-			System.out.println();
-			throw new InvalidFileException("Wrong zlbsignature");
-		}
-
-		file.read(props);
-
-		if (f.firstSlice != f.lastSlice) {
-			int firstlen = (int)file.length()-f.startOffset-zlbsignature.length-5;
-			int lastlen = f.compressedSize-firstlen;
-
-			byte[] first = new byte[firstlen];
-			file.read(first);
-			next();
-			byte[] last = new byte[lastlen];
-			file.read(last);
-
-			for (int i = 0; i < tmp.length; i++) {
-				if (i < firstlen)
-					tmp[i] = first[i];
-				else
-					tmp[i] = last[i-firstlen];
+		synchronized (this) {
+			file.seek(f.startOffset);
+			if (!Util.isByteArrayEqual(Util.readBytes(file, zlbsignature.length), zlbsignature)) {
+				throw new InvalidFileException("Wrong zlbsignature");
 			}
-		} else {
-			file.read(tmp);
+
+			file.read(props);
+
+			if (f.firstSlice != f.lastSlice) {
+				int firstlen = (int)file.length()-f.startOffset-zlbsignature.length-5;
+				int lastlen = f.compressedSize-firstlen;
+
+				byte[] first = new byte[firstlen];
+				file.read(first);
+				next();
+				byte[] last = new byte[lastlen];
+				file.read(last);
+
+				System.arraycopy(first, 0, tmp, 0 ,firstlen);
+				System.arraycopy(last, 0, tmp, firstlen, lastlen);
+			} else {
+				file.read(tmp);
+			}
 		}
 
 		FileData data = new FileData();
@@ -75,7 +72,7 @@ class Slice {
 
 
 	/** reads data for next file from list. */
-	public synchronized FileData readNextFile() throws FileNotFoundException, InvalidFileException, IOException {
+	public FileData readNextFile() throws FileNotFoundException, InvalidFileException, IOException {
 		FileList.FileLocation loc = list.nextFile();
 		if (loc != null)
 			return readFile(loc);
