@@ -7,7 +7,7 @@ class Slice {
 	private String path;
 	private char slicenum = 'a';
 	private RandomAccessFile file;
-	private FileList list = FileList.getInstance();
+	private final FileList list = FileList.getInstance();
 
 	public Slice(String path) throws InvalidFileException, FileNotFoundException {
 		this.path = path;
@@ -69,7 +69,6 @@ class Slice {
 		data.file = f;
 		return data;
 	}
-
 
 	/** reads data for next file from list. */
 	public FileData readNextFile() throws FileNotFoundException, InvalidFileException, IOException {

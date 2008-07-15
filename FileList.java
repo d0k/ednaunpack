@@ -39,7 +39,7 @@ public class FileList {
 	}
 
 	public FileLocation nextFile(){
-		String[] line;
+		String read;
 		synchronized (this) {
 			int start = offset;
 			while (data[offset] != '\n') {
@@ -48,10 +48,13 @@ public class FileList {
 				offset++;
 			}
 
-			line = new String(data, start, offset-start).split(";");
+			read = new String(data, start, offset-start);
 			offset++;
 		}
-		DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm");
+		String[] line = read.split(";");
+		if (line.length != 8)
+			return null;
+		final DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm");
 		try {
 			Date mtime = df.parse(line[1]);
 			return new FileLocation(line[0], Integer.parseInt(line[2]), Integer.parseInt(line[3]), Integer.parseInt(line[4]), Integer.parseInt(line[6]), Integer.parseInt(line[7]), mtime);
