@@ -2,6 +2,8 @@ import java.io.*;
 
 
 public final class Util {
+	private Util() {} // don't allow instances
+
 	/** converts 4 bytes of little endian data into a 32 bit integer. */
 	public static int littleEndianToInt(byte[] bytes) {
 		return (int) (((bytes[0] & 0xff) << 0) +

@@ -5,6 +5,7 @@ import javax.swing.*;
 
 
 public class GUI extends JFrame implements ActionListener, UI {
+	private static final long serialVersionUID = 1L;
 	private JTextField dvdpath, destinationpath;
 	private JProgressBar progress;
 	private JButton install, close;
@@ -39,7 +40,7 @@ public class GUI extends JFrame implements ActionListener, UI {
 
 
 		progress = new JProgressBar();
-		progress.setMaximum(27578);
+		progress.setMaximum(27578); // TODO maybe we can get this from the file list?
 		getContentPane().add(progress);
 
 

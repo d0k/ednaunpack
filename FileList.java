@@ -5,14 +5,15 @@ import java.util.Date;
 import SevenZip.Compression.LZMA.Decoder;
 
 public class FileList {
-	private static FileList instance = null;
 	private byte[] data;
 	private int offset;
 
-	private FileList() {
+	/** Creates a new FileList and reads a file list from an lzma compressed stream (lzma file format by lzma-utils)
+	 * @param in input stream the list is read from
+	 */
+	public FileList(InputStream in) {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			InputStream in = this.getClass().getClassLoader().getResourceAsStream("files.lzma");
 
 			Decoder decoder = new Decoder();
 			byte[] props = new byte[5];
@@ -34,16 +35,15 @@ public class FileList {
 		}
 	}
 
-	public static FileList getInstance() {
-		return instance == null ? new FileList() : instance;
-	}
-
+	/** Returns the next file information from the read list.
+	 * @return a FileLoction with the read information or null if an error occurs (or the list is exhausted)
+	 */
 	public FileLocation nextFile(){
 		String read;
 		synchronized (this) {
 			int start = offset;
 			while (data[offset] != '\n') {
-				if (offset+2 == data.length)
+				if (offset+1 == data.length)
 					return null;
 				offset++;
 			}
@@ -56,26 +56,34 @@ public class FileList {
 			return null;
 		final DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm");
 		try {
-			Date mtime = df.parse(line[1]);
-			return new FileLocation(line[0], Integer.parseInt(line[2]), Integer.parseInt(line[3]), Integer.parseInt(line[4]), Integer.parseInt(line[6]), Integer.parseInt(line[7]), mtime);
+			FileLocation fl = new FileLocation();
+			fl.fileName = line[0];
+			fl.firstSlice = Integer.parseInt(line[2]);
+			fl.lastSlice = Integer.parseInt(line[3]);
+			fl.startOffset = Integer.parseInt(line[4]);
+			fl.originalSize = Integer.parseInt(line[6]);
+			fl.compressedSize = Integer.parseInt(line[7]);
+			fl.mtime = df.parse(line[1]);
+			return fl;
 		} catch (ParseException e) {
 			return null;
 		}
 	}
 
 	public static class FileLocation {
+		/** path and name of the file. */
 		public String fileName;
-		public int firstSlice, lastSlice;
-		public int startOffset, originalSize, compressedSize;
+		/** first slice which contains data of this file */
+		public int firstSlice;
+		/** last slice which contains data of this file */
+		public int lastSlice;
+		/** the data starts in the first Slice at this offset */
+		public int startOffset;
+		/** the decompressed size of the file */
+		public int originalSize;
+		/** the compressed size of the file */
+		public int compressedSize;
+		/** the modification time of the file */
 		public Date mtime;
-		private FileLocation(String fileName, int firstSlice, int lastSlice, int startOffset, int originalSize, int compressedSize, Date mtime) {
-			this.fileName = fileName;
-			this.firstSlice = firstSlice;
-			this.lastSlice = lastSlice;
-			this.startOffset = startOffset;
-			this.originalSize = originalSize;
-			this.compressedSize = compressedSize;
-			this.mtime = mtime;
-		}
 	}
 }

@@ -27,6 +27,7 @@ public class Worker extends Thread {
 				File f = new File(fileName);
 				f.getParentFile().mkdirs();
 
+				// check if we need to undo the tranformation on x86 executables
 				if ((file.fileName.contains(".exe") || file.fileName.contains(".dll"))) { //TODO there is an attribute for this
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					decoder.Code(in, out, file.originalSize);

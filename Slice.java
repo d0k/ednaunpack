@@ -7,8 +7,9 @@ class Slice {
 	private String path;
 	private char slicenum = 'a';
 	private RandomAccessFile file;
-	private final FileList list = FileList.getInstance();
+	private final FileList list = new FileList(getClass().getClassLoader().getResourceAsStream("files.lzma"));
 
+	/** creates a new Slice object and reads the first Slice */
 	public Slice(String path) throws InvalidFileException, FileNotFoundException {
 		this.path = path;
 		next();
@@ -22,6 +23,11 @@ class Slice {
 				file.close();
 			file = new RandomAccessFile(fileName, "r");
 
+			/* Slice file format:
+			 * first 8 bytes contain the signature "idska32"+26
+			 * then a 4 byte 32 bit integer follows which contains the length of the Slice file
+			 */
+
 			if (!Util.isByteArrayEqual(Util.readBytes(file, signature.length), signature))
 				throw new InvalidFileException("Wrong signature");
 
@@ -33,21 +39,25 @@ class Slice {
 		}
 	}
 
-	/** reads data for <b>f</b> from Slice. */
+	/** reads data for <b>f</b> from Slice.
+	 * If the file is continued in the next Slice, the next Slice is opened and the old Slice is closed.<br/>
+	 * <b>Warning</b>: The file must not span across more than 2 slices and must begin in the open Slice!
+	 */
 	private FileData readFile(FileList.FileLocation f) throws InvalidFileException, FileNotFoundException, IOException {
 		byte[] tmp = new byte[f.compressedSize];
 		byte[] props = new byte[5];
 
 		synchronized (this) {
 			file.seek(f.startOffset);
+			/* the begin of a new file is marked with the signature "zlb"+26 */
 			if (!Util.isByteArrayEqual(Util.readBytes(file, zlbsignature.length), zlbsignature)) {
 				throw new InvalidFileException("Wrong zlbsignature");
 			}
 
 			file.read(props);
 
-			if (f.firstSlice != f.lastSlice) {
-				int firstlen = (int)file.length()-f.startOffset-zlbsignature.length-5;
+			if (f.firstSlice != f.lastSlice) { // TODO files with more than 2 slices?
+				int firstlen = (int)file.length()-f.startOffset-zlbsignature.length-5; // TODO examine these 5 bytes
 				int lastlen = f.compressedSize-firstlen;
 
 				byte[] first = new byte[firstlen];
@@ -79,8 +89,11 @@ class Slice {
 	}
 
 	public static class FileData {
+		/** byte properties for the lzma-decoder */
 		public byte[] props;
+		/** actual compresed data */
 		public byte[] data;
+		/** information about the file */
 		public FileList.FileLocation file;
 	}
 }
