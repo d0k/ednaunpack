@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project default="compile" basedir=".">
 	<target name="compile">
-		<javac srcdir="." destdir="." target="1.6" source="1.6"/>
+		<javac srcdir="." destdir="." target="1.5" source="1.5"/>
 	</target>
 
 	<target name="compresslist">

@@ -59,7 +59,6 @@ public class GUI extends JFrame implements ActionListener, UI {
 		setVisible(true);
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == install) {
 			Unpack unpack = new Unpack(this);
@@ -80,29 +79,24 @@ public class GUI extends JFrame implements ActionListener, UI {
 		new GUI();
 	}
 
-	@Override
 	public synchronized void increaseProgress() {
 		progress.setValue(progress.getValue()+1);
 	}
 
-	@Override
 	public void showError(String text) {
 		JOptionPane.showMessageDialog(new JFrame(), text, "Error", JOptionPane.ERROR_MESSAGE);
 		enableFields(true);
 	}
 
-	@Override
 	public void showSuccess() {
 		JOptionPane.showMessageDialog(new JFrame(), "Installation abgeschlossen!", "Fertig", JOptionPane.INFORMATION_MESSAGE);
 		System.exit(0);
 	}
 
-	@Override
 	public synchronized String getDVDPath() {
 		return dvdpath.getText();
 	}
 
-	@Override
 	public synchronized String getDestinationPath() {
 		return destinationpath.getText();
 	}
