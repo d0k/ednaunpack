@@ -18,6 +18,9 @@ class Slice {
 	private void next() throws InvalidFileException, FileNotFoundException {
 		try {
 			String fileName = path+"/setup-1"+slicenum+".bin";
+			if (!new File(fileName).exists()) // setup- does not exist, trying setup_ (fixes a bug reported by Ignaz Forster)
+				fileName = path+"/setup_1"+slicenum+".bin";
+
 			slicenum++;
 			if (file != null)
 				file.close();
