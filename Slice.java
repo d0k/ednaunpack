@@ -7,36 +7,48 @@ class Slice {
 	private String path;
 	private char slicenum = 'a';
 	private RandomAccessFile file;
-	private final FileList list = new FileList(getClass().getClassLoader().getResourceAsStream("files.lzma"));
+	private FileList list;
+	private boolean readSetup;
 
 	/** creates a new Slice object and reads the first Slice */
-	public Slice(String path) throws InvalidFileException, FileNotFoundException {
+	public Slice(String path, FileList list) throws InvalidFileException, FileNotFoundException {
+		this (path, list, false);
+	}
+
+	public Slice(String path, FileList list, boolean readSetup) throws InvalidFileException, FileNotFoundException {
+		this.list = list;
 		this.path = path;
+		this.readSetup = readSetup;
 		next();
 	}
 
 	private void next() throws InvalidFileException, FileNotFoundException {
 		try {
-			String fileName = path+"/setup-1"+slicenum+".bin";
-			if (!new File(fileName).exists()) // setup- does not exist, trying setup_ (fixes a bug reported by Ignaz Forster)
-				fileName = path+"/setup_1"+slicenum+".bin";
+			if (readSetup) {
+				String fileName = path;
+				file = new RandomAccessFile(fileName, "r");
+				readSetup = false;
+			} else {
+				String fileName = path+"/setup-1"+slicenum+".bin";
+				if (!new File(fileName).exists()) // setup- does not exist, trying setup_ (fixes a bug reported by Ignaz Forster)
+					fileName = path+"/setup_1"+slicenum+".bin";
 
-			slicenum++;
-			if (file != null)
-				file.close();
-			file = new RandomAccessFile(fileName, "r");
+				slicenum++;
+				if (file != null)
+					file.close();
+				file = new RandomAccessFile(fileName, "r");
 
-			/* Slice file format:
-			 * first 8 bytes contain the signature "idska32"+26
-			 * then a 4 byte 32 bit integer follows which contains the length of the Slice file
-			 */
+				/* Slice file format:
+				 * first 8 bytes contain the signature "idska32"+26
+				 * then a 4 byte 32 bit integer follows which contains the length of the Slice file
+				 */
 
-			if (!Util.isByteArrayEqual(Util.readBytes(file, signature.length), signature))
-				throw new InvalidFileException("Wrong signature");
+				if (!Util.isByteArrayEqual(Util.readBytes(file, signature.length), signature))
+					throw new InvalidFileException("Wrong signature");
 
-			if (Util.littleEndianToInt(Util.readBytes(file, 4)) != new File(fileName).length()) //TODO do we really need an extra file handle?
-				throw new InvalidFileException("Wrong filesize");
-
+				if (Util.littleEndianToInt(Util.readBytes(file, 4)) != new File(fileName).length()) //TODO do we really need an extra file handle?
+					throw new InvalidFileException("Wrong filesize");
+			}
 		} catch (IOException e) {
 			throw new InvalidFileException(e.getMessage());
 		}

@@ -8,17 +8,22 @@
 		<exec executable="lzma">
 			<arg value="-k"/>
 			<arg value="-z"/>
-			<!--<arg value="-best"/>-->
 			<arg value="files.csv"/>
 		</exec>
 		<move file="files.csv.lzma" tofile="files.lzma"/>
+		<exec executable="lzma">
+			<arg value="-k"/>
+			<arg value="-z"/>
+			<arg value="demo.csv"/>
+		</exec>
+		<move file="demo.csv.lzma" tofile="demo.lzma"/>
 	</target>
 
 	<target name="jar" depends="compile,compresslist">
 		<manifest file="MANIFEST.MF">
 			<attribute name="Main-Class" value="GUI"/>
 		</manifest>
-		<jar destfile="ednaunpack.jar" manifest="MANIFEST.MF" basedir="." includes="**/*.class files.lzma"/>
+		<jar destfile="ednaunpack.jar" manifest="MANIFEST.MF" basedir="." includes="**/*.class files.lzma demo.lzma"/>
 	</target>
 
 	<target name="clean">
@@ -27,6 +32,7 @@
 				<include name="**/*.class"/>
 				<include name="MANIFEST.MF"/>
 				<include name="files.lzma"/>
+				<include name="demo.lzma"/>
 			</fileset>
 		</delete>
 	</target>

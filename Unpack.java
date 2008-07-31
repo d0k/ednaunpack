@@ -11,7 +11,15 @@ public class Unpack extends Thread {
 	@Override
 	public void run() {
 		try {
-			Slice slice = new Slice(gui.getDVDPath()+"/install/instbin/software");
+			File f = new File(gui.getDVDPath());
+			Slice slice;
+			if (f.isFile()) {
+				FileList list = new FileList(getClass().getClassLoader().getResourceAsStream("demo.lzma"));
+				slice = new Slice(f.getAbsolutePath(), list, true);
+			} else {
+				FileList list = new FileList(getClass().getClassLoader().getResourceAsStream("files.lzma"));
+				slice = new Slice(gui.getDVDPath()+"/install/instbin/software", list);
+			}
 			Worker[] w = new Worker[Runtime.getRuntime().availableProcessors()];
 
 			for (int i = 0; i < w.length; i++) {
