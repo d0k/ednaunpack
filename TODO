@@ -1,2 +1,11 @@
 * documentation
+
+* make use of java.concurrency
+** threadpool
+** queue instead of on-demand parsing of the filelist
+** I also think that there are some synchronization issues in the current code
+
+* get filelist directly from setup.exe
+** will be complicated since the layout changes almost every inno setup version
+
 * better GUI
